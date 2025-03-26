@@ -1,10 +1,10 @@
 import React from 'react';
 import LoginForm from '../components/LoginForm';
+import styles from './LoginPage.module.css'; // Tạo file CSS cho LoginPage nếu cần
 
 const LoginPage = () => {
     return (
-        <div>
-            {/* Bạn có thể thêm background hoặc các yếu tố khác của trang login ở đây */}
+        <div className={styles.loginPageContainer}> {/* Thêm container để style nếu cần */}
             <LoginForm />
         </div>
     );

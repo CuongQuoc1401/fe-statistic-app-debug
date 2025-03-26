@@ -1,8 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
-import styles from './LoginForm.module.css'; // Import CSS Module
-import backgroundImage from '../../src/assets/website-forms-bg.jpg'; // Đảm bảo đường dẫn này đúng
+import styles from './LoginForm.module.css';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -27,8 +26,8 @@ const LoginForm = () => {
     };
 
     return (
-        <div className={styles.form_container} style={{ backgroundImage: `url(${backgroundImage})` }}> {/* Áp dụng container style và hiển thị form */}
-            <div className={`${styles.form} ${styles.login_form}`}> {/* Áp dụng login form style */}
+        <div className={styles.form_container}> {/* Loại bỏ class active ban đầu */}
+            <div className={`${styles.form} ${styles.login_form}`}>
                 <form onSubmit={handleSubmit}>
                     <h2>Login</h2>
                     {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -66,12 +65,10 @@ const LoginForm = () => {
                     </div>
                     <button type="submit" className={styles.button}>Login Now</button>
                     <div className={styles.login_signup}>
-                        Don't have an account? <a href="#" id="signup">Signup</a> {/* Bạn có thể xử lý việc chuyển đổi form sau */}
+                        Don't have an account? <a href="#" id="signup">Signup</a>
                     </div>
                 </form>
             </div>
-
-            {/* Bạn có thể thêm form đăng ký ở đây nếu muốn, tương tự như trên */}
         </div>
     );
 };

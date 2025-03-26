@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
-import styles from './DashboardPage.module.css'; // Import CSS Module
+import styles from './DashboardPage.module.css';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -19,36 +19,26 @@ const MenuProps = {
 };
 
 const searchOptions = [
-    'Option A',
+    'Best Seller',
     'Option B',
     'Option C',
     'Option D',
     'Option E',
 ];
 
-function getStyles(name, selectedOptions, theme) {
-    return {
-        fontWeight:
-            selectedOptions.includes(name)
-                ? theme.typography.fontWeightMedium
-                : theme.typography.fontWeightRegular,
-    };
-}
-
 function DashboardPage({ onLogout }) {
     const theme = useTheme();
-    const [selectedOptions, setSelectedOptions] = React.useState([]);
-    const [isSelectOpen, setIsSelectOpen] = React.useState(false); // State để kiểm soát việc mở dropdown
+    const [selectedOption, setSelectedOption] = React.useState(''); // Chỉ một state cho một lựa chọn
+    const [isSelectOpen, setIsSelectOpen] = React.useState(false);
 
     const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setSelectedOptions(typeof value === 'string' ? value.split(',') : value);
+        setSelectedOption(event.target.value);
+        setIsSelectOpen(false); // Đóng dropdown sau khi chọn
     };
 
     const handleSearchClick = () => {
-        console.log('Searching for:', selectedOptions);
+        console.log('Searching for:', selectedOption);
+        // Thêm logic tìm kiếm ở đây với selectedOption
     };
 
     const handleOpenSelect = () => {
@@ -63,10 +53,10 @@ function DashboardPage({ onLogout }) {
         <div className={styles.dashboardContainer}>
             <header className={styles.header}>
                 <nav className={styles.nav}>
-                    <div className={styles.nav_left}>
+                    <div className={styles.navLeft}>
                         <h1>Product</h1>
                     </div>
-                    <ul className={styles.nav_right}>
+                    <ul className={styles.navRight}>
                         <li>
                             <Button variant="outlined" color="secondary" onClick={onLogout}>
                                 Logout
@@ -75,42 +65,38 @@ function DashboardPage({ onLogout }) {
                     </ul>
                 </nav>
             </header>
-            <div className={styles.searchSection}>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                    <Select
-                        multiple
-                        displayEmpty
-                        open={isSelectOpen} // Kiểm soát trạng thái mở
-                        onOpen={handleOpenSelect}
-                        onClose={handleCloseSelect}
-                        value={selectedOptions}
-                        onChange={handleChange}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (
-                            selected.length === 0 ? <em>Select options</em> : selected.join(', ')
-                        )}
-                        MenuProps={MenuProps}
-                        inputProps={{ 'aria-label': 'Without label' }}
-                    >
-                        <MenuItem disabled value="">
-                            <em>Select options</em>
-                        </MenuItem>
-                        {searchOptions.map((option) => (
-                            <MenuItem
-                                key={option}
-                                value={option}
-                                style={getStyles(option, selectedOptions, theme)}
-                            >
-                                {option}
+            <div className={styles.content}> {/* Container cho nội dung giữa */}
+                <div className={styles.searchSection}>
+                    <FormControl sx={{ m: 1, width: 300 }}>
+                        <Select
+                            displayEmpty
+                            open={isSelectOpen}
+                            onOpen={handleOpenSelect}
+                            onClose={handleCloseSelect}
+                            value={selectedOption} // Sử dụng selectedOption
+                            onChange={handleChange}
+                            input={<OutlinedInput />}
+                            renderValue={(selected) => (
+                                selected ? selected : <em>Select an option</em>
+                            )}
+                            MenuProps={MenuProps}
+                            inputProps={{ 'aria-label': 'Without label' }}
+                        >
+                            <MenuItem disabled value="">
+                                <em>Select an option</em>
                             </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Button variant="contained" color="primary" onClick={handleSearchClick} sx={{ mt: 1 }}>
-                    Search
-                </Button>
+                            {searchOptions.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Button variant="contained" color="primary" onClick={handleSearchClick} sx={{ mt: 1 }}>
+                        Search
+                    </Button>
+                </div>
             </div>
-            {/* Các phần khác của dashboard */}
         </div>
     );
 }

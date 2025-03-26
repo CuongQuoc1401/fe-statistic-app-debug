@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
         // **LƯU Ý QUAN TRỌNG:**
         // Trong ứng dụng thực tế, bạn sẽ gọi API backend ở đây để xác thực người dùng.
         // Chúng ta sẽ mô phỏng đăng nhập thành công ở đây cho mục đích demo.
-        if (email === 'test@example.com' && password === 'password') {
+        if (email === 'a@gmail.com' && password === '1111') {
             setIsLoggedIn(true);
             setUser({ email }); // Lưu thông tin người dùng (tùy chọn)
             return true; // Đăng nhập thành công

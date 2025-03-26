@@ -26,8 +26,9 @@ const LoginForm = () => {
     };
 
     return (
-        <div className={styles.form_container}> {/* Loại bỏ class active ban đầu */}
+        <div className={styles.form_container}>
             <div className={`${styles.form} ${styles.login_form}`}>
+                <i className={`uil uil-times ${styles.form_close}`} onClick={() => navigate('/')}></i>
                 <form onSubmit={handleSubmit}>
                     <h2>Login</h2>
                     {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './HomePage.module.css'; // Tạo file CSS cho trang chủ nếu cần
-import backgroundImage from '../assets/website-forms-bg.jpg'; // Import ảnh nền
+import styles from './HomePage.module.css';
+import backgroundImage from '../assets/website-forms-bg.jpg';
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -26,7 +26,6 @@ const HomePage = () => {
                     <button className={styles.button} onClick={handleLoginClick}>Login</button>
                 </nav>
             </header>
-            {/* Bạn có thể thêm nội dung khác cho trang chủ ở đây */}
         </div>
     );
 };

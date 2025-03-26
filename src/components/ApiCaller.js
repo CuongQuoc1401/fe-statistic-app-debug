@@ -20,7 +20,7 @@ function ApiCaller() {
     callApi();
 
     // Thiết lập interval để gọi API mỗi 25 phút (25 * 60 * 1000 milliseconds)
-    const intervalId = setInterval(callApi, 25 * 60 * 1000);
+    const intervalId = setInterval(callApi, 14 * 60 * 1000);
 
     // Cleanup function để clear interval khi component unmount
     return () => clearInterval(intervalId);

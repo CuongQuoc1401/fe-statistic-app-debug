@@ -1,11 +1,16 @@
 import React, { useContext } from 'react';
-import { Route, Navigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../components/AuthContext'; // Giả sử bạn có AuthContext
 
 const ProtectedRoute = ({ children }) => {
-    const { isLoggedIn } = useContext(AuthContext);
+    const { isAuthenticated } = useContext(AuthContext);
+    const token = localStorage.getItem('token');
 
-    return isLoggedIn ? children : <Navigate to="/login" />;
+    if (isAuthenticated || token) {
+        return children;
+    } else {
+        return <Navigate to="/login" />;
+    }
 };
 
 export default ProtectedRoute;

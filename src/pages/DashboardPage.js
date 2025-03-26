@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { useTheme } from '@mui/material/styles';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
-import styles from './DashboardPage.module.css';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../components/AuthContext'; // Import AuthContext
+
+import styles from './DashboardPage.module.css'; // Import CSS Module
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -18,35 +22,78 @@ const MenuProps = {
     },
 };
 
-const searchOptions = [
-    'Best Seller',
-    'Option B',
-    'Option C',
-    'Option D',
-    'Option E',
-];
+const names = ['Best Sellers', 'Function A', 'Function B'];
 
-function DashboardPage({ onLogout }) {
+function getStyles(name, personName, theme) {
+    return {
+        fontWeight: personName.includes(name)
+            ? theme.typography.fontWeightMedium
+            : theme.typography.fontWeightRegular,
+    };
+}
+
+function DashboardPage() {
     const theme = useTheme();
-    const [selectedOption, setSelectedOption] = React.useState(''); // Chỉ một state cho một lựa chọn
-    const [isSelectOpen, setIsSelectOpen] = React.useState(false);
+    const [personName, setPersonName] = useState([]);
+    const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isSelectOpen, setIsSelectOpen] = useState(false);
+    const [token, setToken] = useState(null);
+    const navigate = useNavigate();
+    const { logout } = useContext(AuthContext); // Lấy hàm logout từ context
+
+    useEffect(() => {
+        const storedToken =
+            localStorage.getItem('token') ||
+            document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1');
+        if (storedToken) {
+            setToken(storedToken);
+        }
+        console.log('DashboardPage rendered, token:', storedToken);
+    }, []);
 
     const handleChange = (event) => {
-        setSelectedOption(event.target.value);
-        setIsSelectOpen(false); // Đóng dropdown sau khi chọn
+        const {
+            target: { value },
+        } = event;
+        setPersonName(typeof value === 'string' ? value.split(',') : value);
+        setIsSelectOpen(false);
     };
 
-    const handleSearchClick = () => {
-        console.log('Searching for:', selectedOption);
-        // Thêm logic tìm kiếm ở đây với selectedOption
-    };
-
-    const handleOpenSelect = () => {
+    const handleOpen = () => {
         setIsSelectOpen(true);
     };
 
-    const handleCloseSelect = () => {
-        setIsSelectOpen(false);
+    const handleSearch = async () => {
+        console.log('handleSearch called, token:', token, 'personName:', personName);
+        setLoading(true);
+        setError(null);
+
+        try {
+            let url =
+                'https://bigdata-project-a8w0.onrender.com/best_sellers/multiple?names=';
+            url += personName.join(',');
+
+            const response = await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setResults(response.data);
+        } catch (error) {
+            setError(error.message || 'Failed to fetch data.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        if (logout) {
+            logout();
+        }
+        navigate('/login');
     };
 
     return (
@@ -58,45 +105,65 @@ function DashboardPage({ onLogout }) {
                     </div>
                     <ul className={styles.navRight}>
                         <li>
-                            <Button variant="outlined" color="secondary" onClick={onLogout}>
+                            <Button variant="outlined" color="secondary" onClick={handleLogout}>
                                 Logout
                             </Button>
                         </li>
                     </ul>
                 </nav>
             </header>
-            <div className={styles.content}> {/* Container cho nội dung giữa */}
-                <div className={styles.searchSection}>
-                    <FormControl sx={{ m: 1, width: 300 }}>
-                        <Select
-                            displayEmpty
-                            open={isSelectOpen}
-                            onOpen={handleOpenSelect}
-                            onClose={handleCloseSelect}
-                            value={selectedOption} // Sử dụng selectedOption
-                            onChange={handleChange}
-                            input={<OutlinedInput />}
-                            renderValue={(selected) => (
-                                selected ? selected : <em>Select an option</em>
-                            )}
-                            MenuProps={MenuProps}
-                            inputProps={{ 'aria-label': 'Without label' }}
-                        >
-                            <MenuItem disabled value="">
-                                <em>Select an option</em>
+            <div className={styles.searchSection}>
+                <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
+                    <Select
+                        multiple
+                        displayEmpty
+                        open={isSelectOpen}
+                        onOpen={handleOpen}
+                        onClose={() => setIsSelectOpen(false)}
+                        value={personName}
+                        onChange={handleChange}
+                        input={<OutlinedInput />}
+                        renderValue={(selected) => {
+                            if (selected.length === 0) {
+                                return <em>Select</em>;
+                            }
+                            return selected.join(', ');
+                        }}
+                        MenuProps={MenuProps}
+                        inputProps={{ 'aria-label': 'Without label' }}
+                    >
+                        <MenuItem disabled value="">
+                            <em>Select</em>
+                        </MenuItem>
+                        {names.map((name) => (
+                            <MenuItem
+                                key={name}
+                                value={name}
+                                style={getStyles(name, personName, theme)}
+                            >
+                                {name}
                             </MenuItem>
-                            {searchOptions.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <Button variant="contained" color="primary" onClick={handleSearchClick} sx={{ mt: 1 }}>
-                        Search
-                    </Button>
-                </div>
+                        ))}
+                    </Select>
+                </FormControl>
+                <Button onClick={handleSearch} disabled={loading || !token}>
+                    {loading ? 'Searching...' : 'Search'}
+                </Button>
             </div>
+            {error && <p className="error">{error}</p>}
+            {loading && <p>Loading...</p>}
+            {results.length > 0 && (
+                <div className="resultsContainer">
+                    <h2>Search Results</h2>
+                    <ul>
+                        {results.map((item, index) => (
+                            <li key={index}>
+                                {item.name} - Quantity Sold: {item.quantity_sold.value}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }

@@ -7,9 +7,8 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../components/AuthContext'; // Import AuthContext
-
-import styles from './DashboardPage.module.css'; // Import CSS Module
+import { AuthContext } from '../components/AuthContext';
+import styles from './DashboardPage.module.css';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -22,26 +21,27 @@ const MenuProps = {
     },
 };
 
-const names = ['Best Sellers', 'Function A', 'Function B'];
+const names = ['Best Sellers', 'Function A', 'Function B']; // Danh sách các tùy chọn
 
-function getStyles(name, personName, theme) {
+function getStyles(name, selectedOptions, theme) {
     return {
-        fontWeight: personName.includes(name)
-            ? theme.typography.fontWeightMedium
-            : theme.typography.fontWeightRegular,
+        fontWeight:
+            selectedOptions === name
+                ? theme.typography.fontWeightMedium
+                : theme.typography.fontWeightRegular,
     };
 }
 
 function DashboardPage() {
     const theme = useTheme();
-    const [personName, setPersonName] = useState([]);
-    const [results, setResults] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState('');
+    const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [token, setToken] = useState(null);
     const navigate = useNavigate();
-    const { logout } = useContext(AuthContext); // Lấy hàm logout từ context
+    const { logout } = useContext(AuthContext);
 
     useEffect(() => {
         const storedToken =
@@ -50,14 +50,10 @@ function DashboardPage() {
         if (storedToken) {
             setToken(storedToken);
         }
-        console.log('DashboardPage rendered, token:', storedToken);
     }, []);
 
     const handleChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setPersonName(typeof value === 'string' ? value.split(',') : value);
+        setSelectedOptions(event.target.value);
         setIsSelectOpen(false);
     };
 
@@ -66,24 +62,36 @@ function DashboardPage() {
     };
 
     const handleSearch = async () => {
-        console.log('handleSearch called, token:', token, 'personName:', personName);
         setLoading(true);
         setError(null);
+        setBestSellers([]); // Reset kết quả cũ
 
-        try {
-            let url =
-                'https://bigdata-project-a8w0.onrender.com/best_sellers/multiple?names=';
-            url += personName.join(',');
+        if (selectedOptions === 'Best Sellers') {
+            try {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
 
-            const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setResults(response.data);
-        } catch (error) {
-            setError(error.message || 'Failed to fetch data.');
-        } finally {
+                const url = `https://bigdata-project-a8w0.onrender.com/best_sellers/${formattedDate}`;
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setBestSellers(response.data);
+            } catch (err) {
+                setError(err.message || 'Failed to fetch best sellers.');
+            } finally {
+                setLoading(false);
+            }
+        } else if (selectedOptions === 'Function A' || selectedOptions === 'Function B') {
+            setError('Chưa có API cho lựa chọn này.');
+            setLoading(false);
+        } else {
+            setError('Vui lòng chọn một tùy chọn.');
             setLoading(false);
         }
     };
@@ -115,20 +123,14 @@ function DashboardPage() {
             <div className={styles.searchSection}>
                 <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
                     <Select
-                        multiple
                         displayEmpty
                         open={isSelectOpen}
                         onOpen={handleOpen}
                         onClose={() => setIsSelectOpen(false)}
-                        value={personName}
+                        value={selectedOptions}
                         onChange={handleChange}
                         input={<OutlinedInput />}
-                        renderValue={(selected) => {
-                            if (selected.length === 0) {
-                                return <em>Select</em>;
-                            }
-                            return selected.join(', ');
-                        }}
+                        renderValue={(selected) => (selected ? selected : <em>Select</em>)}
                         MenuProps={MenuProps}
                         inputProps={{ 'aria-label': 'Without label' }}
                     >
@@ -139,24 +141,24 @@ function DashboardPage() {
                             <MenuItem
                                 key={name}
                                 value={name}
-                                style={getStyles(name, personName, theme)}
+                                style={getStyles(name, selectedOptions, theme)}
                             >
                                 {name}
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
-                <Button onClick={handleSearch} disabled={loading || !token}>
-                    {loading ? 'Searching...' : 'Search'}
+                <Button onClick={handleSearch} disabled={loading || !token} variant="contained" color="primary" sx={{ mt: 3 }}>
+                    Search
                 </Button>
             </div>
-            {error && <p className="error">{error}</p>}
+            {error && <p className={styles.error}>{error}</p>}
             {loading && <p>Loading...</p>}
-            {results.length > 0 && (
-                <div className="resultsContainer">
-                    <h2>Search Results</h2>
+            {bestSellers.length > 0 && (
+                <div className={styles.resultsContainer}>
+                    <h2>Best Sellers for Today</h2>
                     <ul>
-                        {results.map((item, index) => (
+                        {bestSellers.map((item, index) => (
                             <li key={index}>
                                 {item.name} - Quantity Sold: {item.quantity_sold.value}
                             </li>

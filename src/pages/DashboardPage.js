@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
 import styles from './DashboardPage.module.css';
-import { KOREA_TIMEZONE_OFFSET, KOREA_IANA_TIMEZONE } from '../constants'; // Điều chỉnh đường dẫn nếu cần
+import { getKoreaTimeNow, KOREA_IANA_TIMEZONE } from '../constants'; // Điều chỉnh đường dẫn nếu cần
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -69,7 +69,7 @@ function DashboardPage() {
 
         if (selectedOptions === 'Best Sellers') {
             try {
-                const today = KOREA_TIMEZONE_OFFSET;
+                const today = getKoreaTimeNow();
                 const year = today.getFullYear();
                 const month = String(today.getMonth() + 1).padStart(2, '0');
                 const day = String(today.getDate()).padStart(2, '0');

@@ -69,7 +69,8 @@ function DashboardPage() {
 
         if (selectedOptions === 'Best Sellers') {
             try {
-                const today = getKoreaTimeNow();
+                // const today = getKoreaTimeNow();
+                const today = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
                 const year = today.getFullYear();
                 const month = String(today.getMonth() + 1).padStart(2, '0');
                 const day = String(today.getDate()).padStart(2, '0');

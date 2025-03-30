@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/AuthContext';
 import styles from './DashboardPage.module.css';
-import { getKoreaTimeNow, KOREA_IANA_TIMEZONE } from '../constants'; // Điều chỉnh đường dẫn nếu cần
+import { getUTCDateFormatted } from '../constants'; // Điều chỉnh đường dẫn nếu cần
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -69,14 +69,14 @@ function DashboardPage() {
 
         if (selectedOptions === 'Best Sellers') {
             try {
-                // const today = getKoreaTimeNow();
-                const today = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                const formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
+                const today = getUTCDateFormatted();
+                // const today = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
+                // const year = today.getFullYear();
+                // const month = String(today.getMonth() + 1).padStart(2, '0');
+                // const day = String(today.getDate()).padStart(2, '0');
+                // const formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
 
-                const url = `https://bigdata-project-a8w0.onrender.com/best_sellers/${formattedDate}`;
+                const url = `https://bigdata-project-a8w0.onrender.com/best_sellers/${today}`;
 
                 const response = await axios.get(url, {
                     headers: {

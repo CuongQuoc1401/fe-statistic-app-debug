@@ -1,15 +1,18 @@
 // constants.js
 
-// Offset của Hàn Quốc so với UTC (tính bằng mili giây)
-export const getKoreaTimeNow = () => {
-    const now = new Date();
-    const koreaOffset = 9 * 60 * 60 * 1000; // Offset của Hàn Quốc so với UTC (9 tiếng)
-    const localOffset = now.getTimezoneOffset() * 60 * 1000; // Offset của múi giờ hiện tại so với UTC
-    const koreaTime = new Date(now.getTime() + localOffset + koreaOffset);
-    return koreaTime;
-  };
+function getUTCDateFormatted() {
+  const now = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
 
-// Tên múi giờ IANA cho Hàn Quốc (sử dụng cho Intl.DateTimeFormat)
-export const KOREA_IANA_TIMEZONE = 'Asia/Seoul';
+  // Lấy offset múi giờ của người dùng (số phút lệch so với UTC)
+  const userOffset = now.getTimezoneOffset();
 
-// (Bạn có thể thêm các hằng số khác liên quan đến thời gian hoặc ứng dụng tại đây)
+  // Tạo một Date object mới biểu diễn thời điểm UTC
+  // Bằng cách trừ đi offset (đổi dấu vì getTimezoneOffset trả về giá trị ngược)
+  const utcNow = new Date(now.getTime() + userOffset * 60 * 1000);
+
+  const year = utcNow.getFullYear();
+  const month = String(utcNow.getMonth() + 1).padStart(2, '0');
+  const day = String(utcNow.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}

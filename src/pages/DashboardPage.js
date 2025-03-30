@@ -158,11 +158,11 @@ function DashboardPage() {
             {loading && <p>Loading...</p>}
             {bestSellers.length > 0 && (
                 <div className={styles.resultsContainer}>
-                    <h2>Best Sellers for Today</h2>
+                    <h2>Best Sellers for SamSungShop</h2>
                     <ul>
                         {bestSellers.map((item, index) => (
                             <li key={index}>
-                                {item.name} - Quantity Sold: {item.quantity_sold.value}
+                                {item.name} - Quantity Sold: {item.quantity_sold}
                             </li>
                         ))}
                     </ul>

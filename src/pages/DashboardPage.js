@@ -67,7 +67,7 @@ function DashboardPage() {
         setError(null);
         setBestSellers([]); // Reset kết quả cũ
 
-        if (selectedOptions === 'Best Sellers') {
+        if (selectedOptions === 'Best Sellers Of Shop') {
             try {
                 const today = getUTCDateFormatted();
                 // const today = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
@@ -89,7 +89,10 @@ function DashboardPage() {
             } finally {
                 setLoading(false);
             }
-        } else if (selectedOptions === 'Function A' || selectedOptions === 'Function B') {
+        } else if (selectedOptions === 'Best Sellers Yesterday') {
+            setError('Chưa có API cho lựa chọn này.');
+            setLoading(false);
+        }else if (selectedOptions === 'Function A' || selectedOptions === 'Function B') {
             setError('Chưa có API cho lựa chọn này.');
             setLoading(false);
         } else {

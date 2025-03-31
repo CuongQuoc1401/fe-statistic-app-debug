@@ -1,6 +1,6 @@
 // constants.js
 
-function getUTCDateFormatted() {
+export function getUTCDateFormatted() {
   const now = new Date(); // Lấy thời gian hiện tại theo múi giờ của người dùng
 
   // Lấy offset múi giờ của người dùng (số phút lệch so với UTC)

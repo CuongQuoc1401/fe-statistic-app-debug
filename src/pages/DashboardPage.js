@@ -22,7 +22,7 @@ const MenuProps = {
     },
 };
 
-const names = ['Best Sellers', 'Function A', 'Function B']; // Danh sách các tùy chọn
+const names = ['Best Sellers Of Shop', 'Best Sellers Yesterday', 'Function A', 'Function B']; // Danh sách các tùy chọn
 
 function getStyles(name, selectedOptions, theme) {
     return {
@@ -37,6 +37,7 @@ function DashboardPage() {
     const theme = useTheme();
     const [selectedOptions, setSelectedOptions] = useState('');
     const [bestSellers, setBestSellers] = useState([]);
+    const [bestSellersYesterday, setbestSellersYesterday] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -66,6 +67,7 @@ function DashboardPage() {
         setLoading(true);
         setError(null);
         setBestSellers([]); // Reset kết quả cũ
+        setbestSellersYesterday([]); // Reset kết quả cũ
 
         if (selectedOptions === 'Best Sellers Of Shop') {
             try {
@@ -90,8 +92,21 @@ function DashboardPage() {
                 setLoading(false);
             }
         } else if (selectedOptions === 'Best Sellers Yesterday') {
-            setError('Chưa có API cho lựa chọn này.');
-            setLoading(false);
+            try {
+                // const today = getUTCDateFormatted();
+                const url = `https://bigdata-project-a8w0.onrender.com/best_sellers_yesterday?limit=10`;
+
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setbestSellersYesterday(response.data);
+            } catch (err) {
+                setError(err.message || 'Failed to fetch best sellers.');
+            } finally {
+                setLoading(false);
+            }
         }else if (selectedOptions === 'Function A' || selectedOptions === 'Function B') {
             setError('Chưa có API cho lựa chọn này.');
             setLoading(false);
@@ -166,6 +181,18 @@ function DashboardPage() {
                         {bestSellers.map((item, index) => (
                             <li key={index}>
                                 {item.name} - Quantity Sold: {item.quantity_sold}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {bestSellersYesterday.length > 0 && (
+                <div className={styles.resultsContainer}>
+                    <h2>Best Sellers Yesterday</h2>
+                    <ul>
+                        {bestSellersYesterday.map((item, index) => (
+                            <li key={index}>
+                                {item.name} - Quantity Sold: {item.quantity_sold_change}
                             </li>
                         ))}
                     </ul>
